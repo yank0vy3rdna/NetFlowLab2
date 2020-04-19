@@ -53,7 +53,7 @@ s_tarif get_tarif(ifstream* stream){
  * количество байт в пакете если совпадает и -1 если файл закончился
  */
 
-int process(ifstream* stream, string* target_ip){
+int process(ifstream* stream, string* target_ip, ofstream* forpython){
     string str;
     if(getline(*stream, str)) {
         std::istringstream buf(str);
@@ -66,6 +66,7 @@ int process(ifstream* stream, string* target_ip){
         int bytes = stoi(tokens[11]);
 //        std::cout << '"' << ip << " " << bytes << '"' << '\n';
         if (ip == *target_ip) {
+	    *forpython << tokens[0] << " " << tokens[1] << " ";
             return bytes;
         } else {
             return 0;
@@ -78,28 +79,37 @@ int process(ifstream* stream, string* target_ip){
 int main() {
     string s;
     ifstream inf("data");
+    ofstream forpython("forplot");
     ifstream tarif_file("tarif");
     s_tarif tarif = get_tarif(&tarif_file);
     getline(inf, s);
+    int fullsumm = 0;
     int firstfree = 0;
     int counter = 0;
     while(true) {
-        int packet_size = process(&inf, &tarif.ip);
+        int packet_size = process(&inf, &tarif.ip, &forpython);
         if (packet_size == -1) {
             break;
         }
+	fullsumm += packet_size;
         if (firstfree == -1) {
             counter += packet_size;
+	    if(packet_size>0)
+	        forpython << packet_size<< endl;
+
         } else {
             firstfree += packet_size;
+	    if(packet_size>0)
+	        forpython << packet_size << endl;
         }
         if (firstfree >= tarif.firstfree) {
-            counter += firstfree - tarif.firstfree;
             firstfree = -1;
         }
     }
     cout << (double) counter / 131072 * tarif.k << endl;
+    system("python3 plot.py");
     inf.close();
+    forpython.close();
     tarif_file.close();
     return 0;
 }
