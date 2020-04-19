@@ -1,0 +1,4 @@
+nfdump -r nfcapd.202002251200 > data
+echo -e "ip: 217.15.20.194\nk: 1\nfirstfree: 1000" > tarif
+g++ -o lab2.out main.cpp
+./lab2.out
