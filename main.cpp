@@ -62,10 +62,13 @@ int process(ifstream* stream, string* target_ip, ofstream* forpython){
         if (tokens[0]=="Summary:")
             return -1;
         string ip = tokens[7].substr(0, tokens[7].find_first_of(':'));
-//        std::cout << '"' << ip << " " << tokens[11] << '"' << '\n';
-        int bytes = stoi(tokens[11]);
-//        std::cout << '"' << ip << " " << bytes << '"' << '\n';
-        if (ip == *target_ip) {
+        int bytes;
+	if(tokens[12]!="M"){
+            bytes = stoi(tokens[11]);
+	}else{
+	    bytes = stod(tokens[11])*1024*1024;
+	}
+        if (str.find(*target_ip) != str.npos) {
 	    *forpython << tokens[0] << " " << tokens[1] << " ";
             return bytes;
         } else {
@@ -86,6 +89,7 @@ int main() {
     int fullsumm = 0;
     int firstfree = 0;
     int counter = 0;
+    int i = 0;
     while(true) {
         int packet_size = process(&inf, &tarif.ip, &forpython);
         if (packet_size == -1) {
@@ -94,19 +98,23 @@ int main() {
 	fullsumm += packet_size;
         if (firstfree == -1) {
             counter += packet_size;
-	    if(packet_size>0)
+	    if(packet_size>0){
 	        forpython << packet_size<< endl;
+		i+=1;
+	    }
 
         } else {
             firstfree += packet_size;
-	    if(packet_size>0)
+	    if(packet_size>0){
 	        forpython << packet_size << endl;
+		i+=1;
+	    }
         }
         if (firstfree >= tarif.firstfree) {
             firstfree = -1;
         }
     }
-    cout << (double) counter / 131072 * tarif.k << endl;
+    cout << i << " "<<(double) counter / 131072 * tarif.k << endl;
     system("python3 plot.py");
     inf.close();
     forpython.close();
