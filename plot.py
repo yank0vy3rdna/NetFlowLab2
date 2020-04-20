@@ -14,7 +14,12 @@ x = [i[0] for i in data]
 a = 0
 for i in data:
     a += i[1]
-    y.append(a)
+    y.append(a/128)
 (fig, ax) = plt.subplots(1, 1)
 ax.plot(x, y)
-plt.savefig('foo.png')
+for n, label in enumerate(ax.xaxis.get_ticklabels()):
+    if n % 2 != 0:
+        label.set_visible(False)
+ax.yaxis.set_major_formatter(plt.FormatStrFormatter('%d'))
+plt.ylabel('Kbit')
+plt.savefig('plot.png')
