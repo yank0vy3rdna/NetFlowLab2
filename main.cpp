@@ -89,7 +89,6 @@ int main() {
     int fullsumm = 0;
     int firstfree = 0;
     int counter = 0;
-    int i = 0;
     while(true) {
         int packet_size = process(&inf, &tarif.ip, &forpython);
         if (packet_size == -1) {
@@ -100,21 +99,19 @@ int main() {
             counter += packet_size;
 	    if(packet_size>0){
 	        forpython << packet_size<< endl;
-		i+=1;
 	    }
 
         } else {
             firstfree += packet_size;
 	    if(packet_size>0){
 	        forpython << packet_size << endl;
-		i+=1;
 	    }
         }
         if (firstfree >= tarif.firstfree) {
             firstfree = -1;
         }
     }
-    cout << i << " "<<(double) counter / 131072 * tarif.k << endl;
+    cout << (double) counter / 131072 * tarif.k << endl;
     system("python3 plot.py");
     inf.close();
     forpython.close();
