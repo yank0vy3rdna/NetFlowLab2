@@ -84,34 +84,25 @@ int main() {
     ifstream inf("data");
     ofstream forpython("forplot");
     ifstream tarif_file("tarif");
-    s_tarif tarif = get_tarif(&tarif_file);
+   s_tarif tarif = get_tarif(&tarif_file);
     getline(inf, s);
     int fullsumm = 0;
-    int firstfree = 0;
-    int counter = 0;
     while(true) {
         int packet_size = process(&inf, &tarif.ip, &forpython);
         if (packet_size == -1) {
             break;
         }
 	fullsumm += packet_size;
-        if (firstfree == -1) {
-            counter += packet_size;
-	    if(packet_size>0){
-	        forpython << packet_size<< endl;
-	    }
-
-        } else {
-            firstfree += packet_size;
-	    if(packet_size>0){
-	        forpython << packet_size << endl;
-	    }
-        }
-        if (firstfree >= tarif.firstfree) {
-            firstfree = -1;
-        }
+	if(packet_size>0)
+	    forpython << packet_size<< endl;
+        
     }
-    cout << (double) counter / 131072 * tarif.k << endl;
+    int a = fullsumm - tarif.firstfree;
+    if (a <= tarif.firstfree)
+	fullsumm = 0;
+    else
+	fullsumm -= tarif.firstfree;
+    std::cout << (double) fullsumm /131072 * tarif.k << endl;
     system("python3 plot.py");
     inf.close();
     forpython.close();
