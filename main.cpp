@@ -43,7 +43,7 @@ s_tarif get_tarif(ifstream* stream){
         std::istringstream buf(a);
         std::istream_iterator<std::string> beg(buf), end;
         std::vector<std::string> tokens(beg, end);
-        tarif.firstfree = stoi(tokens[1])*128;
+        tarif.firstfree = stoi(tokens[1])*131072;
     }
     return tarif;
 }
@@ -98,10 +98,10 @@ int main() {
         
     }
     int a = fullsumm - tarif.firstfree;
-    if (a <= tarif.firstfree)
+    if (a <= 0)
 	fullsumm = 0;
     else
-	fullsumm -= tarif.firstfree;
+	fullsumm = a;
     std::cout << (double) fullsumm /131072 * tarif.k << endl;
     system("python3 plot.py");
     inf.close();
